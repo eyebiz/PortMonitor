@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             tableLayoutPanel1 = new TableLayoutPanel();
             panel1 = new Panel();
             btnExit = new Button();
@@ -182,7 +181,6 @@
             // notifyIcon1
             // 
             notifyIcon1.ContextMenuStrip = contextMenuStrip1;
-            notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
             notifyIcon1.Text = "Port Monitor";
             notifyIcon1.Visible = true;
             notifyIcon1.MouseDoubleClick += notifyIcon1_MouseDoubleClick;
