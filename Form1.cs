@@ -15,6 +15,8 @@ namespace PortMonitor
         public Form1()
         {
             InitializeComponent();
+            this.Icon = Properties.Resources.AppIcon;
+            notifyIcon1.Icon = Properties.Resources.AppIcon;
             _settings = ConfigManager.Load();
         }
 
@@ -247,6 +249,31 @@ namespace PortMonitor
         {
             _settings.CloseToTray = false;
             Application.Exit();
+        }
+
+        private void configToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (SettingsForm configWindow = new SettingsForm())
+            {
+                if (configWindow.ShowDialog() == DialogResult.OK)
+                {
+                    _settings = ConfigManager.Load();
+                }
+            }
+        }
+
+        private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            _settings.CloseToTray = false;
+            Application.Exit();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (AboutForm about = new AboutForm())
+            {
+                about.ShowDialog();
+            }
         }
     }
 }

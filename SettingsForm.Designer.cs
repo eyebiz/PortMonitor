@@ -83,6 +83,9 @@
             Controls.Add(btnSaveSettings);
             Controls.Add(chkOpenMinimized);
             Controls.Add(chkCloseToTray);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "SettingsForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Config";

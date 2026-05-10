@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             tableLayoutPanel1 = new TableLayoutPanel();
             panel1 = new Panel();
+            btnExit = new Button();
             btnConfig = new Button();
             btnStart = new Button();
             txtPort = new TextBox();
@@ -48,8 +49,10 @@
             lblStatus = new ToolStripStatusLabel();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
+            configToolStripMenuItem = new ToolStripMenuItem();
+            exitToolStripMenuItem1 = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
-            btnExit = new Button();
+            aboutToolStripMenuItem = new ToolStripMenuItem();
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -89,6 +92,16 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(568, 34);
             panel1.TabIndex = 1;
+            // 
+            // btnExit
+            // 
+            btnExit.Location = new Point(456, 5);
+            btnExit.Name = "btnExit";
+            btnExit.Size = new Size(75, 23);
+            btnExit.TabIndex = 4;
+            btnExit.Text = "Exit";
+            btnExit.UseVisualStyleBackColor = true;
+            btnExit.Click += btnExit_Click;
             // 
             // btnConfig
             // 
@@ -220,25 +233,38 @@
             // 
             // fileToolStripMenuItem
             // 
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { configToolStripMenuItem, exitToolStripMenuItem1 });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
             // 
+            // configToolStripMenuItem
+            // 
+            configToolStripMenuItem.Name = "configToolStripMenuItem";
+            configToolStripMenuItem.Size = new Size(110, 22);
+            configToolStripMenuItem.Text = "Config";
+            configToolStripMenuItem.Click += configToolStripMenuItem_Click;
+            // 
+            // exitToolStripMenuItem1
+            // 
+            exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
+            exitToolStripMenuItem1.Size = new Size(110, 22);
+            exitToolStripMenuItem1.Text = "Exit";
+            exitToolStripMenuItem1.Click += exitToolStripMenuItem1_Click;
+            // 
             // helpToolStripMenuItem
             // 
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new Size(44, 20);
             helpToolStripMenuItem.Text = "Help";
             // 
-            // btnExit
+            // aboutToolStripMenuItem
             // 
-            btnExit.Location = new Point(456, 5);
-            btnExit.Name = "btnExit";
-            btnExit.Size = new Size(75, 23);
-            btnExit.TabIndex = 4;
-            btnExit.Text = "Exit";
-            btnExit.UseVisualStyleBackColor = true;
-            btnExit.Click += btnExit_Click;
+            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            aboutToolStripMenuItem.Size = new Size(107, 22);
+            aboutToolStripMenuItem.Text = "About";
+            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
             // Form1
             // 
@@ -248,7 +274,6 @@
             Controls.Add(menuStrip1);
             Controls.Add(statusStrip1);
             Controls.Add(tableLayoutPanel1);
-            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(800, 500);
             Name = "Form1";
             Text = "Port Monitor";
@@ -289,5 +314,8 @@
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem helpToolStripMenuItem;
         private Button btnExit;
+        private ToolStripMenuItem configToolStripMenuItem;
+        private ToolStripMenuItem exitToolStripMenuItem1;
+        private ToolStripMenuItem aboutToolStripMenuItem;
     }
 }
