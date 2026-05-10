@@ -88,49 +88,66 @@ namespace PortMonitor
             {
                 while (!token.IsCancellationRequested)
                 {
-                    // Wait for a connection
+                    // 1. Wait for a connection (stops when app closes)
                     using var client = await _listener!.AcceptTcpClientAsync(token);
-                    var remoteIp = client.Client.RemoteEndPoint?.ToString() ?? "Unknown";
 
-                    // Capture a bit of data (the "commands" or headers)
+                    // 2. IPv6-safe IP extraction (removes port correctly for any address type)
+                    string remoteIp = client.Client.RemoteEndPoint is IPEndPoint ep
+                        ? ep.Address.ToString()
+                        : "Unknown";
+
+                    // 3. Security: Set a 3-second timeout for reading data
+                    // This prevents "Slowloris" attacks from hanging your loop
+                    using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(token);
+                    timeoutCts.CancelAfter(3000);
+
                     byte[] buffer = new byte[1024];
-                    var stream = client.GetStream();
-                    int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, token);
-                    string data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    int bytesRead = 0;
+                    string data = "[No data sent]";
 
-                    // 1. Prepare the strings on the background thread
+                    try
+                    {
+                        var stream = client.GetStream();
+                        bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, timeoutCts.Token);
+                        if (bytesRead > 0)
+                        {
+                            data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                        }
+                    }
+                    catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested)
+                    {
+                        // Attacker stayed connected but sent no data; we timeout and move on
+                        data = "[Connection Timeout - No Data]";
+                    }
+
+                    // 4. Prepare clean strings (First line only to strip binary noise)
                     string tool = data.Split('\r', '\n')[0];
                     string logEntry = $"[{DateTime.Now:HH:mm:ss}] Connection from {remoteIp}\n";
                     logEntry += $"   Data: {tool}\n";
-                    logEntry += new string('-', 40) + "\n";
+                    string separator = new string('-', 40) + "\n";
 
-                    // 2. Update the UI (Thread-safe)
+                    // 5. Update UI (Thread-safe)
                     Invoke(() =>
                     {
-                        richTextBox1.AppendText(logEntry);
+                        richTextBox1.AppendText(logEntry + separator);
                         richTextBox1.ScrollToCaret();
-                        string ipOnly = remoteIp.Split(':')[0];
 
-                        // Add to ListBox if it's not already there
-                        if (!lstIPs.Items.Contains(ipOnly))
+                        // Add to ListBox if unique
+                        if (!lstIPs.Items.Contains(remoteIp))
                         {
-                            lstIPs.Items.Add(ipOnly);
+                            lstIPs.Items.Add(remoteIp);
                         }
                     });
 
-                    // 3. Write to File (Still on background thread, no Invoke needed)
-                    try
-                    {
-                        // Note: Use a regular AppendAllText or await the Async version here
-                        await File.AppendAllTextAsync(_currentLogPath, logEntry);
-                    }
-                    catch { /* Log file error to lblStatus if needed */ }
+                    // 6. Write to File (Background thread)
+                    try { await File.AppendAllTextAsync(_currentLogPath, logEntry + separator); }
+                    catch { /* File lock check */ }
                 }
             }
-            catch (OperationCanceledException) { /* Expected on stop */ }
+            catch (OperationCanceledException) { /* App stopped */ }
             catch (Exception ex)
             {
-                Invoke(() => lblStatus.Text = $"Listener Error: {ex.Message}");
+                Invoke(() => lblStatus.Text = $"Error: {ex.Message}");
             }
         }
 
