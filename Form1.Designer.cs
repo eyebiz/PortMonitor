@@ -169,6 +169,7 @@
             MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "Port Monitor";
+            FormClosing += Form1_FormClosing;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             menuStrip1.ResumeLayout(false);

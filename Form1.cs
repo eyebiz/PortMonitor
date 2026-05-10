@@ -9,6 +9,7 @@ namespace PortMonitor
         private TcpListener? _listener;
         private bool _isMonitoring = false;
         private CancellationTokenSource? _cts;
+        private string _currentLogPath = "";
 
         public Form1()
         {
@@ -24,6 +25,17 @@ namespace PortMonitor
                     lblStatus.Text = "Invalid Port Number";
                     return;
                 }
+
+                // 1. Setup the Log Directory
+                string logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+                if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
+
+                // 2. Setup the Filename: Log_2026-05-10.txt
+                string fileName = $"Log_{DateTime.Now:yyyy-MM-dd}.txt";
+                _currentLogPath = Path.Combine(logDir, fileName);
+
+                // 3. Overwrite/Create the file immediately
+                File.WriteAllText(_currentLogPath, $"--- Monitor Started on Port {txtPort.Text} at {DateTime.Now} ---{Environment.NewLine}");
 
                 try
                 {
@@ -67,23 +79,26 @@ namespace PortMonitor
                     int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, token);
                     string data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
-                    // Update UI safely
+                    // 1. Prepare the strings on the background thread
+                    string tool = data.Split('\r', '\n')[0];
+                    string logEntry = $"[{DateTime.Now:HH:mm:ss}] Connection from {remoteIp}\n";
+                    logEntry += $"   Data: {tool}\n";
+                    logEntry += new string('-', 40) + "\n";
+
+                    // 2. Update the UI (Thread-safe)
                     Invoke(() =>
                     {
-                        // 1. Get the tool name (everything before the first newline)
-                        string tool = data.Split('\r', '\n')[0];
-
-                        // 2. Build the simple 3-line block
-                        string logEntry = $"[{DateTime.Now:HH:mm:ss}] Connection from {remoteIp}\n";
-                        logEntry += $"   Data: {tool}\n";
-                        logEntry += new string('-', 40) + "\n"; // Separator + extra gap
-
-                        // 3. Update the UI
                         richTextBox1.AppendText(logEntry);
                         richTextBox1.ScrollToCaret();
                     });
 
-                    // Optional: Append to file here
+                    // 3. Write to File (Still on background thread, no Invoke needed)
+                    try
+                    {
+                        // Note: Use a regular AppendAllText or await the Async version here
+                        await File.AppendAllTextAsync(_currentLogPath, logEntry);
+                    }
+                    catch { /* Log file error to lblStatus if needed */ }
                 }
             }
             catch (OperationCanceledException) { /* Expected on stop */ }
@@ -101,6 +116,23 @@ namespace PortMonitor
             btnStart.Text = "Start";
             txtPort.Enabled = true;
             lblStatus.Text = "Idle";
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // 1. Stop the listener and background task
+            StopMonitoring();
+
+            // 2. Force a synchronous write to ensure it hits the disk before exit
+            if (!string.IsNullOrEmpty(_currentLogPath))
+            {
+                try
+                {
+                    // Use File.AppendAllText (NOT Async) here
+                    File.AppendAllText(_currentLogPath, $"--- Monitor Stopped at {DateTime.Now} ---{Environment.NewLine}");
+                }
+                catch { /* Final fail-safe */ }
+            }
         }
     }
 }
