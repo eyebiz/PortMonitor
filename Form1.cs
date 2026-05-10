@@ -109,6 +109,13 @@ namespace PortMonitor
                     {
                         richTextBox1.AppendText(logEntry);
                         richTextBox1.ScrollToCaret();
+                        string ipOnly = remoteIp.Split(':')[0];
+
+                        // Add to ListBox if it's not already there
+                        if (!lstIPs.Items.Contains(ipOnly))
+                        {
+                            lstIPs.Items.Add(ipOnly);
+                        }
                     });
 
                     // 3. Write to File (Still on background thread, no Invoke needed)
@@ -206,6 +213,23 @@ namespace PortMonitor
                 this.ShowInTaskbar = false; // Remove from taskbar
                 notifyIcon1.Visible = true; // Ensure tray icon is visible
             }
+        }
+
+        private void btnCopyIPs_Click(object sender, EventArgs e)
+        {
+            if (lstIPs.Items.Count > 0)
+            {
+                // Join all items into one string and set to clipboard
+                string allIPs = string.Join(Environment.NewLine, lstIPs.Items.Cast<string>());
+                Clipboard.SetText(allIPs);
+                lblStatus.Text = $"{lstIPs.Items.Count} IPs copied to clipboard.";
+            }
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            _settings.CloseToTray = false;
+            Application.Exit();
         }
     }
 }
