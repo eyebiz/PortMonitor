@@ -10,10 +10,29 @@ namespace PortMonitor
         private bool _isMonitoring = false;
         private CancellationTokenSource? _cts;
         private string _currentLogPath = "";
+        private AppSettings _settings;
 
         public Form1()
         {
             InitializeComponent();
+            _settings = ConfigManager.Load();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (_settings.OpenMinimized)
+            {
+                // We set this to true so it's visible in the tray
+                notifyIcon1.Visible = true;
+
+                // Hide the main window immediately
+                this.BeginInvoke(new MethodInvoker(delegate
+                {
+                    this.Hide();
+                }));
+            }
         }
 
         private async void btnStart_Click(object sender, EventArgs e)
@@ -120,18 +139,72 @@ namespace PortMonitor
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // 1. Stop the listener and background task
-            StopMonitoring();
+            // Check if the user clicked the [X] and settings allow traying
+            if (e.CloseReason == CloseReason.UserClosing && _settings.CloseToTray)
+            {
+                e.Cancel = true; // Stop the app from actually closing
+                this.Hide();     // Hide the window
 
-            // 2. Force a synchronous write to ensure it hits the disk before exit
+                // Optional: Show a "balloon" tip the first time it happens
+                //notifyIcon1.ShowBalloonTip(2000, "Port Monitor", "Running in background.", ToolTipIcon.Info);
+                return;
+            }
+
+            // Otherwise, do the actual cleanup we wrote before
+            StopMonitoring();
             if (!string.IsNullOrEmpty(_currentLogPath))
             {
-                try
+                File.AppendAllText(_currentLogPath, $"--- Monitor Stopped at {DateTime.Now} ---{Environment.NewLine}");
+            }
+        }
+
+        private void btnConfig_Click(object sender, EventArgs e)
+        {
+            // 1. Create the settings window
+            using (SettingsForm configWindow = new SettingsForm())
+            {
+                // 2. Show it as a popup (Dialog)
+                if (configWindow.ShowDialog() == DialogResult.OK)
                 {
-                    // Use File.AppendAllText (NOT Async) here
-                    File.AppendAllText(_currentLogPath, $"--- Monitor Stopped at {DateTime.Now} ---{Environment.NewLine}");
+                    // 3. If they clicked "Save", reload the settings in your main form
+                    _settings = ConfigManager.Load();
+
+                    // Optional: Show a status message
+                    //lblStatus.Text = "Settings updated.";
                 }
-                catch { /* Final fail-safe */ }
+            }
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.Show();
+            this.ShowInTaskbar = true;
+            this.WindowState = FormWindowState.Normal;
+            this.Activate(); // Bring to front
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settings.CloseToTray = false;
+            Application.Exit();
+        }
+
+        private void restoreToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Show();
+            this.ShowInTaskbar = true;
+            this.WindowState = FormWindowState.Normal;
+            this.Activate(); // Bring to front
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            // If the window is minimized AND the user has "Minimize to Tray" enabled
+            if (this.WindowState == FormWindowState.Minimized && _settings.MinimizeToTray)
+            {
+                this.Hide();               // Remove from screen
+                this.ShowInTaskbar = false; // Remove from taskbar
+                notifyIcon1.Visible = true; // Ensure tray icon is visible
             }
         }
     }
