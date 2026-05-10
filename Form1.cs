@@ -68,11 +68,17 @@ namespace PortMonitor
                     string data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
                     // Update UI safely
-                    Invoke(() => {
-                        string logEntry = $"[{DateTime.Now:HH:mm:ss}] Connection from {remoteIp}\n";
-                        if (!string.IsNullOrWhiteSpace(data))
-                            logEntry += $"   Data: {data.Replace("\n", " ").Replace("\r", "")}\n";
+                    Invoke(() =>
+                    {
+                        // 1. Get the tool name (everything before the first newline)
+                        string tool = data.Split('\r', '\n')[0];
 
+                        // 2. Build the simple 3-line block
+                        string logEntry = $"[{DateTime.Now:HH:mm:ss}] Connection from {remoteIp}\n";
+                        logEntry += $"   Data: {tool}\n";
+                        logEntry += new string('-', 40) + "\n"; // Separator + extra gap
+
+                        // 3. Update the UI
                         richTextBox1.AppendText(logEntry);
                         richTextBox1.ScrollToCaret();
                     });
