@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PortMonitor
 {
@@ -90,22 +91,18 @@ namespace PortMonitor
             {
                 while (!token.IsCancellationRequested)
                 {
-                    // 1. Wait for a connection (stops when app closes)
                     using var client = await _listener!.AcceptTcpClientAsync(token);
 
-                    // 2. IPv6-safe IP extraction (removes port correctly for any address type)
                     string remoteIp = client.Client.RemoteEndPoint is IPEndPoint ep
                         ? ep.Address.ToString()
                         : "Unknown";
 
-                    // 3. Security: Set a 3-second timeout for reading data
-                    // This prevents "Slowloris" attacks from hanging your loop
                     using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(token);
                     timeoutCts.CancelAfter(3000);
 
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[4096]; // Increased buffer to capture more headers
                     int bytesRead = 0;
-                    string data = "[No data sent]";
+                    string rawData = "";
 
                     try
                     {
@@ -113,37 +110,54 @@ namespace PortMonitor
                         bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, timeoutCts.Token);
                         if (bytesRead > 0)
                         {
-                            data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                            rawData = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                         }
                     }
                     catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested)
                     {
-                        // Attacker stayed connected but sent no data; we timeout and move on
-                        data = "[Connection Timeout - No Data]";
+                        rawData = "[Timeout]";
                     }
 
-                    // 4. Prepare clean strings (First line only to strip binary noise)
-                    string tool = data.Split('\r', '\n')[0];
-                    string logEntry = $"[{DateTime.Now:HH:mm:ss}] Connection from {remoteIp}\n";
-                    logEntry += $"   Data: {tool}\n";
-                    string separator = new string('-', 40) + "\n";
+                    // 1. Sanitize and Extract Request Line (First line)
+                    string[] lines = rawData.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                    string firstLine = lines.Length > 0 ? lines[0] : "[No Data]";
+                    string tool = Regex.Replace(firstLine, @"[^\x20-\x7E]", ".");
+                    if (tool.Length > 100) tool = tool.Substring(0, 100) + "...";
 
-                    // 5. Update UI (Thread-safe)
+                    // 2. Extract specific Headers
+                    string userAgent = "Not Found";
+                    string referer = "Not Found";
+
+                    foreach (string line in lines)
+                    {
+                        if (line.StartsWith("User-Agent:", StringComparison.OrdinalIgnoreCase))
+                            userAgent = line.Substring(11).Trim();
+                        if (line.StartsWith("Referer:", StringComparison.OrdinalIgnoreCase))
+                            referer = line.Substring(8).Trim();
+                    }
+
+                    // 3. Build Log Entry
+                    string logEntry = $"[{DateTime.Now:HH:mm:ss}] Connection from {remoteIp}{Environment.NewLine}";
+                    logEntry += $"   Request: {tool}{Environment.NewLine}";
+                    logEntry += $"   Agent:   {userAgent}{Environment.NewLine}";
+                    if (referer != "Not Found") logEntry += $"   Referer: {referer}{Environment.NewLine}";
+                    string separator = new string('-', 40) + Environment.NewLine;
+
+                    // 4. Update UI (Thread-safe)
                     Invoke(() =>
                     {
                         richTextBox1.AppendText(logEntry + separator);
                         richTextBox1.ScrollToCaret();
 
-                        // Add to ListBox if unique
                         if (!lstIPs.Items.Contains(remoteIp))
                         {
                             lstIPs.Items.Add(remoteIp);
                         }
                     });
 
-                    // 6. Write to File (Background thread)
+                    // 5. Write to File
                     try { await File.AppendAllTextAsync(_currentLogPath, logEntry + separator); }
-                    catch { /* File lock check */ }
+                    catch { /* Handle file locks */ }
                 }
             }
             catch (OperationCanceledException) { /* App stopped */ }
