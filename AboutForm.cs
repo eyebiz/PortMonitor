@@ -19,9 +19,10 @@ namespace PortMonitor
             // 1. Core Application Metadata
             lstAboutInfo.Items.Add($"Product: {Application.ProductName}");
             lstAboutInfo.Items.Add($"Version: {Application.ProductVersion}");
-            DateTime buildDate = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location);
+            // Use Process.GetCurrentProcess().MainModule.FileName instead of Assembly.Location
+            string appPath = Environment.ProcessPath ?? string.Empty;
+            DateTime buildDate = File.GetLastWriteTime(appPath);
             lstAboutInfo.Items.Add($"Build Date: {buildDate:yyyy-MM-dd HH:mm:ss}");
-
             lstAboutInfo.Items.Add(new string('-', 30));
 
             // 2. .NET Runtime & Environment Details
