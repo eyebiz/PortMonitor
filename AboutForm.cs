@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace PortMonitor
@@ -18,6 +19,9 @@ namespace PortMonitor
             // 1. Core Application Metadata
             lstAboutInfo.Items.Add($"Product: {Application.ProductName}");
             lstAboutInfo.Items.Add($"Version: {Application.ProductVersion}");
+            DateTime buildDate = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location);
+            lstAboutInfo.Items.Add($"Build Date: {buildDate:yyyy-MM-dd HH:mm:ss}");
+
             lstAboutInfo.Items.Add(new string('-', 30));
 
             // 2. .NET Runtime & Environment Details
