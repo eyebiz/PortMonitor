@@ -36,10 +36,13 @@
             btnStart = new Button();
             txtPort = new TextBox();
             lblPort = new Label();
-            richTextBox1 = new RichTextBox();
             lstIPs = new ListBox();
             panel2 = new Panel();
             btnCopyIPs = new Button();
+            tabControl1 = new TabControl();
+            tabLog = new TabPage();
+            richTextBox1 = new RichTextBox();
+            tabMap = new TabPage();
             notifyIcon1 = new NotifyIcon(components);
             contextMenuStrip1 = new ContextMenuStrip(components);
             restoreToolStripMenuItem = new ToolStripMenuItem();
@@ -55,6 +58,8 @@
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
+            tabControl1.SuspendLayout();
+            tabLog.SuspendLayout();
             contextMenuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
@@ -66,9 +71,9 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 160F));
             tableLayoutPanel1.Controls.Add(panel1, 0, 1);
-            tableLayoutPanel1.Controls.Add(richTextBox1, 0, 2);
             tableLayoutPanel1.Controls.Add(lstIPs, 1, 2);
             tableLayoutPanel1.Controls.Add(panel2, 1, 1);
+            tableLayoutPanel1.Controls.Add(tabControl1, 0, 2);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -139,16 +144,6 @@
             lblPort.TabIndex = 0;
             lblPort.Text = "Listen on Port:";
             // 
-            // richTextBox1
-            // 
-            richTextBox1.Dock = DockStyle.Fill;
-            richTextBox1.Location = new Point(3, 68);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.ReadOnly = true;
-            richTextBox1.Size = new Size(823, 494);
-            richTextBox1.TabIndex = 0;
-            richTextBox1.Text = "";
-            // 
             // lstIPs
             // 
             lstIPs.Dock = DockStyle.Fill;
@@ -177,6 +172,48 @@
             btnCopyIPs.Text = "Save to Clipboard";
             btnCopyIPs.UseVisualStyleBackColor = true;
             btnCopyIPs.Click += btnCopyIPs_Click;
+            // 
+            // tabControl1
+            // 
+            tabControl1.Controls.Add(tabLog);
+            tabControl1.Controls.Add(tabMap);
+            tabControl1.Dock = DockStyle.Fill;
+            tabControl1.Location = new Point(3, 68);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(823, 494);
+            tabControl1.TabIndex = 9;
+            // 
+            // tabLog
+            // 
+            tabLog.Controls.Add(richTextBox1);
+            tabLog.Location = new Point(4, 24);
+            tabLog.Name = "tabLog";
+            tabLog.Padding = new Padding(3);
+            tabLog.Size = new Size(815, 466);
+            tabLog.TabIndex = 0;
+            tabLog.Text = "Log";
+            tabLog.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox1
+            // 
+            richTextBox1.Dock = DockStyle.Fill;
+            richTextBox1.Location = new Point(3, 3);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.ReadOnly = true;
+            richTextBox1.Size = new Size(809, 460);
+            richTextBox1.TabIndex = 1;
+            richTextBox1.Text = "";
+            // 
+            // tabMap
+            // 
+            tabMap.Location = new Point(4, 24);
+            tabMap.Name = "tabMap";
+            tabMap.Padding = new Padding(3);
+            tabMap.Size = new Size(815, 466);
+            tabMap.TabIndex = 1;
+            tabMap.Text = "Map";
+            tabMap.UseVisualStyleBackColor = true;
             // 
             // notifyIcon1
             // 
@@ -281,6 +318,8 @@
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             panel2.ResumeLayout(false);
+            tabControl1.ResumeLayout(false);
+            tabLog.ResumeLayout(false);
             contextMenuStrip1.ResumeLayout(false);
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
@@ -293,7 +332,6 @@
         #endregion
 
         private TableLayoutPanel tableLayoutPanel1;
-        private RichTextBox richTextBox1;
         private Panel panel1;
         private Label lblPort;
         private TextBox txtPort;
@@ -315,5 +353,9 @@
         private ToolStripMenuItem configToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem1;
         private ToolStripMenuItem aboutToolStripMenuItem;
+        private TabControl tabControl1;
+        private TabPage tabLog;
+        private RichTextBox richTextBox1;
+        private TabPage tabMap;
     }
 }
