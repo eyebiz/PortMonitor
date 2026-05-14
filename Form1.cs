@@ -20,7 +20,7 @@ namespace PortMonitor
             this.Icon = Properties.Resources.AppIcon;
             notifyIcon1.Icon = Properties.Resources.AppIcon;
             _settings = ConfigManager.Load();
-            LoadMap(59.3293, 18.0686, 10); // Stockholm
+            lstIPs.SelectedIndexChanged += lstIPs_SelectedIndexChanged;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -213,6 +213,13 @@ namespace PortMonitor
                 Brushes.Black,
                 new PointF(5, bmp.Height - 20));
 
+            // Draw a target marker at the center
+            int centerX = bmp.Width / 2;
+            int centerY = bmp.Height / 2;
+            using Pen pen = new Pen(Color.Red, 2);
+
+            // Circle
+            g.DrawEllipse(pen, centerX - 6, centerY - 6, 12, 12);
             return bmp;
         }
 
@@ -242,6 +249,66 @@ namespace PortMonitor
         private async void LoadMap(double lat, double lon, int zoom)
         {
             pboxMap.Image = await RenderMapAsync(lat, lon, zoom);
+        }
+
+        public async Task<IpInfoResponse> LookupIpInfoAsync(string ip)
+        {
+            using HttpClient client = new HttpClient();
+            string url = $"https://ipinfo.io/{ip}/json";
+            string json = await client.GetStringAsync(url);
+
+            return System.Text.Json.JsonSerializer.Deserialize<IpInfoResponse>(json)!;
+        }
+
+        private async void lstIPs_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (lstIPs.SelectedItem is not string ip)
+                return;
+
+            try
+            {
+                var info = await LookupIpInfoAsync(ip);
+                DisplayGeoData(info);
+                CenterMapOnIp(info);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error fetching IP info: " + ex.Message);
+            }
+        }
+
+        private void DisplayGeoData(IpInfoResponse info)
+        {
+            lstGeoData.Items.Clear();
+
+            lstGeoData.Items.Add($"IP: {info.ip}");
+            lstGeoData.Items.Add($"Hostname: {info.hostname}");
+            lstGeoData.Items.Add($"City: {info.city}");
+            lstGeoData.Items.Add($"Region: {info.region}");
+            lstGeoData.Items.Add($"Country: {info.country}");
+            lstGeoData.Items.Add($"Location: {info.loc}");
+            lstGeoData.Items.Add($"Org: {info.org}");
+            lstGeoData.Items.Add($"Postal: {info.postal}");
+            lstGeoData.Items.Add($"Timezone: {info.timezone}");
+            //lstGeoData.Items.Add($"Anycast: {info.anycast}");
+        }
+
+        private void CenterMapOnIp(IpInfoResponse info)
+        {
+            if (string.IsNullOrWhiteSpace(info.loc))
+                return;
+
+            var parts = info.loc.Split(',');
+            if (parts.Length != 2)
+                return;
+
+            if (double.TryParse(parts[0], System.Globalization.NumberStyles.Any,
+                                System.Globalization.CultureInfo.InvariantCulture, out double lat) &&
+                double.TryParse(parts[1], System.Globalization.NumberStyles.Any,
+                                System.Globalization.CultureInfo.InvariantCulture, out double lon))
+            {
+                LoadMap(lat, lon, 9); // choose your preferred zoom
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

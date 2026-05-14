@@ -43,6 +43,7 @@
             tabLog = new TabPage();
             richTextBox1 = new RichTextBox();
             tabMap = new TabPage();
+            lstGeoData = new ListBox();
             pboxMap = new PictureBox();
             notifyIcon1 = new NotifyIcon(components);
             contextMenuStrip1 = new ContextMenuStrip(components);
@@ -152,6 +153,7 @@
             lstIPs.Dock = DockStyle.Fill;
             lstIPs.FormattingEnabled = true;
             lstIPs.IntegralHeight = false;
+            lstIPs.Items.AddRange(new object[] { "45.198.224.9", "147.185.132.49", "8.216.5.202", "138.68.152.66", "79.124.40.174", "64.227.150.86" });
             lstIPs.Location = new Point(832, 68);
             lstIPs.Name = "lstIPs";
             lstIPs.Size = new Size(154, 494);
@@ -210,6 +212,7 @@
             // 
             // tabMap
             // 
+            tabMap.Controls.Add(lstGeoData);
             tabMap.Controls.Add(pboxMap);
             tabMap.Location = new Point(4, 24);
             tabMap.Name = "tabMap";
@@ -218,6 +221,15 @@
             tabMap.TabIndex = 1;
             tabMap.Text = "Map";
             tabMap.UseVisualStyleBackColor = true;
+            // 
+            // lstGeoData
+            // 
+            lstGeoData.BackColor = SystemColors.Menu;
+            lstGeoData.FormattingEnabled = true;
+            lstGeoData.Location = new Point(6, 6);
+            lstGeoData.Name = "lstGeoData";
+            lstGeoData.Size = new Size(267, 154);
+            lstGeoData.TabIndex = 1;
             // 
             // pboxMap
             // 
@@ -291,14 +303,14 @@
             // configToolStripMenuItem
             // 
             configToolStripMenuItem.Name = "configToolStripMenuItem";
-            configToolStripMenuItem.Size = new Size(180, 22);
+            configToolStripMenuItem.Size = new Size(110, 22);
             configToolStripMenuItem.Text = "Config";
             configToolStripMenuItem.Click += configToolStripMenuItem_Click;
             // 
             // exitToolStripMenuItem1
             // 
             exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
-            exitToolStripMenuItem1.Size = new Size(180, 22);
+            exitToolStripMenuItem1.Size = new Size(110, 22);
             exitToolStripMenuItem1.Text = "Exit";
             exitToolStripMenuItem1.Click += exitToolStripMenuItem1_Click;
             // 
@@ -375,5 +387,6 @@
         private RichTextBox richTextBox1;
         private TabPage tabMap;
         private PictureBox pboxMap;
+        private ListBox lstGeoData;
     }
 }
