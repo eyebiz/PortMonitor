@@ -43,6 +43,7 @@
             tabLog = new TabPage();
             richTextBox1 = new RichTextBox();
             tabMap = new TabPage();
+            pboxMap = new PictureBox();
             notifyIcon1 = new NotifyIcon(components);
             contextMenuStrip1 = new ContextMenuStrip(components);
             restoreToolStripMenuItem = new ToolStripMenuItem();
@@ -60,6 +61,8 @@
             panel2.SuspendLayout();
             tabControl1.SuspendLayout();
             tabLog.SuspendLayout();
+            tabMap.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pboxMap).BeginInit();
             contextMenuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
@@ -94,7 +97,7 @@
             panel1.Controls.Add(lblPort);
             panel1.Location = new Point(3, 28);
             panel1.Name = "panel1";
-            panel1.Size = new Size(568, 34);
+            panel1.Size = new Size(794, 34);
             panel1.TabIndex = 1;
             // 
             // btnExit
@@ -207,6 +210,7 @@
             // 
             // tabMap
             // 
+            tabMap.Controls.Add(pboxMap);
             tabMap.Location = new Point(4, 24);
             tabMap.Name = "tabMap";
             tabMap.Padding = new Padding(3);
@@ -214,6 +218,17 @@
             tabMap.TabIndex = 1;
             tabMap.Text = "Map";
             tabMap.UseVisualStyleBackColor = true;
+            // 
+            // pboxMap
+            // 
+            pboxMap.BackColor = Color.Gainsboro;
+            pboxMap.Dock = DockStyle.Fill;
+            pboxMap.Location = new Point(3, 3);
+            pboxMap.Name = "pboxMap";
+            pboxMap.Size = new Size(809, 460);
+            pboxMap.SizeMode = PictureBoxSizeMode.CenterImage;
+            pboxMap.TabIndex = 0;
+            pboxMap.TabStop = false;
             // 
             // notifyIcon1
             // 
@@ -276,14 +291,14 @@
             // configToolStripMenuItem
             // 
             configToolStripMenuItem.Name = "configToolStripMenuItem";
-            configToolStripMenuItem.Size = new Size(110, 22);
+            configToolStripMenuItem.Size = new Size(180, 22);
             configToolStripMenuItem.Text = "Config";
             configToolStripMenuItem.Click += configToolStripMenuItem_Click;
             // 
             // exitToolStripMenuItem1
             // 
             exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
-            exitToolStripMenuItem1.Size = new Size(110, 22);
+            exitToolStripMenuItem1.Size = new Size(180, 22);
             exitToolStripMenuItem1.Text = "Exit";
             exitToolStripMenuItem1.Click += exitToolStripMenuItem1_Click;
             // 
@@ -320,6 +335,8 @@
             panel2.ResumeLayout(false);
             tabControl1.ResumeLayout(false);
             tabLog.ResumeLayout(false);
+            tabMap.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pboxMap).EndInit();
             contextMenuStrip1.ResumeLayout(false);
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
@@ -357,5 +374,6 @@
         private TabPage tabLog;
         private RichTextBox richTextBox1;
         private TabPage tabMap;
+        private PictureBox pboxMap;
     }
 }

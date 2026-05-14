@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic.Logging;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -19,6 +20,7 @@ namespace PortMonitor
             this.Icon = Properties.Resources.AppIcon;
             notifyIcon1.Icon = Properties.Resources.AppIcon;
             _settings = ConfigManager.Load();
+            LoadMap(59.3293, 18.0686, 10); // Stockholm
         }
 
         protected override void OnLoad(EventArgs e)
@@ -175,6 +177,71 @@ namespace PortMonitor
             btnStart.Text = "Start";
             txtPort.Enabled = true;
             lblStatus.Text = "Idle";
+        }
+
+        public async Task<Image> RenderMapAsync(double lat, double lon, int zoom)
+        {
+            var (cx, cy) = LatLonToTile(lat, lon, zoom);
+
+            const int tileSize = 256;
+            Bitmap bmp = new Bitmap(tileSize * 3, tileSize * 3);
+            using Graphics g = Graphics.FromImage(bmp);
+
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    int tx = cx + dx;
+                    int ty = cy + dy;
+
+                    try
+                    {
+                        Image tile = await DownloadTileAsync(tx, ty, zoom);
+                        g.DrawImage(tile, (dx + 1) * tileSize, (dy + 1) * tileSize);
+                    }
+                    catch
+                    {
+                        // Draw placeholder if tile fails
+                        g.FillRectangle(Brushes.LightGray, (dx + 1) * tileSize, (dy + 1) * tileSize, tileSize, tileSize);
+                    }
+                }
+            }
+
+            // Required attribution
+            g.DrawString("© OpenStreetMap contributors",
+                new Font("Arial", 10),
+                Brushes.Black,
+                new PointF(5, bmp.Height - 20));
+
+            return bmp;
+        }
+
+        private static (int x, int y) LatLonToTile(double lat, double lon, int zoom)
+        {
+            double latRad = lat * Math.PI / 180.0;
+            int n = 1 << zoom;
+
+            int x = (int)((lon + 180.0) / 360.0 * n);
+            int y = (int)((1.0 - Math.Log(Math.Tan(latRad) + 1.0 / Math.Cos(latRad)) / Math.PI) / 2.0 * n);
+
+            return (x, y);
+        }
+
+        private static async Task<Image> DownloadTileAsync(int x, int y, int zoom)
+        {
+            string url = $"https://tile.openstreetmap.de/{zoom}/{x}/{y}.png";
+
+            using HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Port Monitor/1.0 (contact: your-email-or-website)");
+
+            var bytes = await client.GetByteArrayAsync(url);
+            using var ms = new MemoryStream(bytes);
+            return Image.FromStream(ms);
+        }
+
+        private async void LoadMap(double lat, double lon, int zoom)
+        {
+            pboxMap.Image = await RenderMapAsync(lat, lon, zoom);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

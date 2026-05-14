@@ -28,21 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            pictureBox1 = new PictureBox();
+            pboxAboutLogo = new PictureBox();
             lblAboutTitle = new Label();
             lstAboutInfo = new ListBox();
             lblAboutCopyright = new Label();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pboxAboutLogo).BeginInit();
             SuspendLayout();
             // 
-            // pictureBox1
+            // pboxAboutLogo
             // 
-            pictureBox1.Image = Properties.Resources.AppIcon.ToBitmap();
-            pictureBox1.Location = new Point(12, 12);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(66, 66);
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
+            pboxAboutLogo.Image = Properties.Resources.AppIcon.ToBitmap();
+            pboxAboutLogo.Location = new Point(12, 12);
+            pboxAboutLogo.Name = "pboxAboutLogo";
+            pboxAboutLogo.Size = new Size(66, 66);
+            pboxAboutLogo.TabIndex = 0;
+            pboxAboutLogo.TabStop = false;
             // 
             // lblAboutTitle
             // 
@@ -79,21 +79,21 @@
             Controls.Add(lblAboutCopyright);
             Controls.Add(lstAboutInfo);
             Controls.Add(lblAboutTitle);
-            Controls.Add(pictureBox1);
+            Controls.Add(pboxAboutLogo);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AboutForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "About";
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pboxAboutLogo).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private PictureBox pictureBox1;
+        private PictureBox pboxAboutLogo;
         private Label lblAboutTitle;
         private ListBox lstAboutInfo;
         private Label lblAboutCopyright;
