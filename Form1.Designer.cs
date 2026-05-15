@@ -153,7 +153,6 @@
             lstIPs.Dock = DockStyle.Fill;
             lstIPs.FormattingEnabled = true;
             lstIPs.IntegralHeight = false;
-            lstIPs.Items.AddRange(new object[] { "45.198.224.9", "147.185.132.49", "8.216.5.202", "138.68.152.66", "79.124.40.174", "64.227.150.86" });
             lstIPs.Location = new Point(832, 68);
             lstIPs.Name = "lstIPs";
             lstIPs.Size = new Size(154, 494);

@@ -21,6 +21,8 @@ namespace PortMonitor
             notifyIcon1.Icon = Properties.Resources.AppIcon;
             _settings = ConfigManager.Load();
             lstIPs.SelectedIndexChanged += lstIPs_SelectedIndexChanged;
+            // Uncomment this for testing 
+            lstIPs.Items.AddRange(["45.198.224.9", "147.185.132.49", "8.216.5.202", "138.68.152.66", "79.124.40.174", "64.227.150.86"]);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -59,7 +61,9 @@ namespace PortMonitor
                 _currentLogPath = Path.Combine(logDir, fileName);
 
                 // 3. Overwrite/Create the file immediately
-                File.WriteAllText(_currentLogPath, $"--- Monitor Started on Port {txtPort.Text} at {DateTime.Now} ---{Environment.NewLine}");
+                string logEntry = $"--- Monitor Started on Port {txtPort.Text} at {DateTime.Now} ---{Environment.NewLine}";
+                richTextBox1.AppendText(logEntry);
+                File.AppendAllText(_currentLogPath, logEntry);
 
                 try
                 {
@@ -177,6 +181,24 @@ namespace PortMonitor
             btnStart.Text = "Start";
             txtPort.Enabled = true;
             lblStatus.Text = "Idle";
+            if (!string.IsNullOrEmpty(_currentLogPath))
+            {
+                string logEntry = $"--- Monitor Stopped at {DateTime.Now} ---{Environment.NewLine}";
+                richTextBox1.AppendText(logEntry);
+                File.AppendAllText(_currentLogPath, logEntry);
+            }
+        }
+
+        private async Task ShowTemporaryStatus(string message, int ms = 5000)
+        {
+            lblStatus.Text = message;
+            string snapshot = message; // capture what we set
+            await Task.Delay(ms);
+
+            if (_isMonitoring && lblStatus.Text == snapshot)
+            {
+                lblStatus.Text = $"Listening on port {txtPort.Text}...";
+            }
         }
 
         public async Task<Image> RenderMapAsync(double lat, double lon, int zoom)
@@ -323,28 +345,17 @@ namespace PortMonitor
                 //notifyIcon1.ShowBalloonTip(2000, "Port Monitor", "Running in background.", ToolTipIcon.Info);
                 return;
             }
-
-            // Otherwise, do the actual cleanup we wrote before
-            StopMonitoring();
-            if (!string.IsNullOrEmpty(_currentLogPath))
-            {
-                File.AppendAllText(_currentLogPath, $"--- Monitor Stopped at {DateTime.Now} ---{Environment.NewLine}");
-            }
+            if (_isMonitoring) { StopMonitoring(); }
         }
 
-        private void btnConfig_Click(object sender, EventArgs e)
+        private async void btnConfig_Click(object sender, EventArgs e)
         {
-            // 1. Create the settings window
             using (SettingsForm configWindow = new SettingsForm())
             {
-                // 2. Show it as a popup (Dialog)
                 if (configWindow.ShowDialog() == DialogResult.OK)
                 {
-                    // 3. If they clicked "Save", reload the settings in your main form
                     _settings = ConfigManager.Load();
-
-                    // Optional: Show a status message
-                    //lblStatus.Text = "Settings updated.";
+                    await ShowTemporaryStatus("Settings updated.");
                 }
             }
         }
@@ -382,14 +393,13 @@ namespace PortMonitor
             }
         }
 
-        private void btnCopyIPs_Click(object sender, EventArgs e)
+        private async void btnCopyIPs_Click(object sender, EventArgs e)
         {
             if (lstIPs.Items.Count > 0)
             {
-                // Join all items into one string and set to clipboard
                 string allIPs = string.Join(Environment.NewLine, lstIPs.Items.Cast<string>());
                 Clipboard.SetText(allIPs);
-                lblStatus.Text = $"{lstIPs.Items.Count} IPs copied to clipboard.";
+                await ShowTemporaryStatus($"{lstIPs.Items.Count} IPs copied to clipboard.");
             }
         }
 
