@@ -37,7 +37,6 @@
             // 
             // pboxAboutLogo
             // 
-            pboxAboutLogo.Image = Properties.Resources.AppIcon.ToBitmap();
             pboxAboutLogo.Location = new Point(12, 12);
             pboxAboutLogo.Name = "pboxAboutLogo";
             pboxAboutLogo.Size = new Size(66, 66);
