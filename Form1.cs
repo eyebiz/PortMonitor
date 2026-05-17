@@ -13,6 +13,7 @@ namespace PortMonitor
         private CancellationTokenSource? _cts;
         private string _currentLogPath = "";
         private AppSettings _settings;
+        private readonly string _nl = Environment.NewLine;
 
         public Form1()
         {
@@ -61,7 +62,7 @@ namespace PortMonitor
                 _currentLogPath = Path.Combine(logDir, fileName);
 
                 // 3. Overwrite/Create the file immediately
-                string logEntry = $"--- Monitoring started on port {txtPort.Text} at {DateTime.Now} ---{Environment.NewLine}";
+                string logEntry = $"--- Monitoring started on port {txtPort.Text} at {DateTime.Now} ---{_nl}";
                 richTextBox1.AppendText(logEntry);
                 File.AppendAllText(_currentLogPath, logEntry);
 
@@ -206,7 +207,7 @@ namespace PortMonitor
             // Body extraction (only if headers exist)
             int blankIndex = Array.FindIndex(lines, l => string.IsNullOrWhiteSpace(l));
             if (details.HeaderLines.Count > 0 && blankIndex >= 0 && blankIndex < lines.Length - 1)
-                details.Body = string.Join("\n", lines.Skip(blankIndex + 1));
+                details.Body = string.Join(_nl, lines.Skip(blankIndex + 1));
 
             // Line stats
             details.LineCount = lines.Length;
@@ -229,48 +230,47 @@ namespace PortMonitor
         private void LogConnection(ConnectionDetails details)
         {
             string logEntry =
-                $"[{DateTime.Now:HH:mm:ss}] Connection from {details.RemoteIp}:{details.RemotePort} → {details.LocalPort}\n" +
-                $"   Connected:     {details.ConnectedAt:HH:mm:ss.fff}\n" +
-                $"   Disconnected:  {details.DisconnectedAt:HH:mm:ss.fff}\n" +
-                $"   Duration:      {(details.Duration).TotalMilliseconds:F0} ms\n" +
-                $"   Timed Out:     {(details.TimedOut ? "Yes" : "No")}\n" +
-                $"   Client Closed: {(details.ClientClosed ? "Yes" : "No")}\n\n" +
-                $"   Bytes Read:    {details.BytesRead}\n" +
-                //$"   First Bytes:   {details.FirstBytesHex}\n" +
-                $"   ASCII:         {details.AsciiPercentage:F1}%   Printable: {details.PrintablePercentage:F1}%\n" +
-                $"   Entropy:       {details.Entropy:F2}\n\n";
+                $"[{DateTime.Now:HH:mm:ss}] Connection from {details.RemoteIp}:{details.RemotePort} → {details.LocalPort}{_nl}" +
+                $"   Connected:     {details.ConnectedAt:HH:mm:ss.fff}{_nl}" +
+                $"   Disconnected:  {details.DisconnectedAt:HH:mm:ss.fff}{_nl}" +
+                $"   Duration:      {(details.Duration).TotalMilliseconds:F0} ms{_nl}" +
+                $"   Timed Out:     {(details.TimedOut ? "Yes" : "No")}{_nl}" +
+                $"   Client Closed: {(details.ClientClosed ? "Yes" : "No")}{_nl}{_nl}" +
+                $"   Bytes Read:    {details.BytesRead}{_nl}" +
+                //$"   First Bytes:   {details.FirstBytesHex}{_nl}" +
+                $"   ASCII:         {details.AsciiPercentage:F1}%   Printable: {details.PrintablePercentage:F1}%{_nl}" +
+                $"   Entropy:       {details.Entropy:F2}{_nl}{_nl}";
 
             // Always show first line if printable
             if (!string.IsNullOrWhiteSpace(details.FirstLineSanitized))
-                logEntry += $"   First Line:    {details.FirstLineSanitized}\n";
+                logEntry += $"   First Line:    {details.FirstLineSanitized}{_nl}";
 
             // Binary payload suppression
             if (details.PrintablePercentage < 80.0)
             {
-                logEntry += "   Payload:       [Binary data suppressed]\n";
-                logEntry += new string('-', 40) + "\n";
+                logEntry += $"   Payload:       [Binary data suppressed]{_nl}";
             }
             else
             {
                 logEntry +=
-                    $"   Lines:         {details.LineCount}\n" +
-                    $"   Max Line Len:  {details.MaxLineLength}\n\n";
+                    $"   Lines:         {details.LineCount}{_nl}" +
+                    $"   Max Line Len:  {details.MaxLineLength}{_nl}{_nl}";
 
                 if (details.HeaderLines.Count > 0)
                 {
-                    logEntry += "   Headers:\n";
+                    logEntry += $"   Headers:{_nl}";
                     foreach (var h in details.HeaderLines)
-                        logEntry += $"      {h}\n";
-                    logEntry += "\n";
+                        logEntry += $"      {h}{_nl}";
+                    logEntry += _nl;
                 }
 
                 if (!string.IsNullOrWhiteSpace(details.Body))
                 {
-                    logEntry += "   Body:\n";
-                    logEntry += details.Body + "\n\n";
+                    logEntry += $"   Body:{_nl}";
+                    logEntry += details.Body + _nl + _nl;
                 }
-                logEntry += new string('-', 40) + "\n";
             }
+            logEntry += new string('-', 60) + _nl;
 
             // UI update
             Invoke(() =>
@@ -297,7 +297,7 @@ namespace PortMonitor
             lblStatus.Text = "Idle";
             if (!string.IsNullOrEmpty(_currentLogPath))
             {
-                string logEntry = $"--- Monitoring stopped at {DateTime.Now} ---{Environment.NewLine}";
+                string logEntry = $"--- Monitoring stopped at {DateTime.Now} ---{_nl}";
                 richTextBox1.AppendText(logEntry);
                 File.AppendAllText(_currentLogPath, logEntry);
             }
@@ -511,7 +511,7 @@ namespace PortMonitor
         {
             if (lstIPs.Items.Count > 0)
             {
-                string allIPs = string.Join(Environment.NewLine, lstIPs.Items.Cast<string>());
+                string allIPs = string.Join(_nl, lstIPs.Items.Cast<string>());
                 Clipboard.SetText(allIPs);
                 await ShowTemporaryStatus($"{lstIPs.Items.Count} IPs copied to clipboard.");
             }

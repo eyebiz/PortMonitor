@@ -64,7 +64,7 @@
             // lblAboutCopyright
             // 
             lblAboutCopyright.AutoSize = true;
-            lblAboutCopyright.Location = new Point(22, 95);
+            lblAboutCopyright.Location = new Point(22, 81);
             lblAboutCopyright.Name = "lblAboutCopyright";
             lblAboutCopyright.Size = new Size(45, 15);
             lblAboutCopyright.TabIndex = 3;
