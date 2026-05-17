@@ -202,6 +202,7 @@
             // richTextBox1
             // 
             richTextBox1.Dock = DockStyle.Fill;
+            richTextBox1.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             richTextBox1.Location = new Point(3, 3);
             richTextBox1.Name = "richTextBox1";
             richTextBox1.ReadOnly = true;

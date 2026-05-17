@@ -22,7 +22,7 @@ namespace PortMonitor
             _settings = ConfigManager.Load();
             lstIPs.SelectedIndexChanged += lstIPs_SelectedIndexChanged;
             // Uncomment this for testing 
-            lstIPs.Items.AddRange(["45.198.224.9", "147.185.132.49", "8.216.5.202", "138.68.152.66", "79.124.40.174", "64.227.150.86"]);
+            //lstIPs.Items.AddRange(["45.198.224.9", "147.185.132.49", "8.216.5.202", "138.68.152.66", "79.124.40.174", "64.227.150.86"]);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -98,79 +98,193 @@ namespace PortMonitor
                 while (!token.IsCancellationRequested)
                 {
                     using var client = await _listener!.AcceptTcpClientAsync(token);
+                    client.NoDelay = true; // ensure no accidental writes
 
-                    string remoteIp = client.Client.RemoteEndPoint is IPEndPoint ep
-                        ? ep.Address.ToString()
-                        : "Unknown";
+                    var details = new ConnectionDetails
+                    {
+                        ConnectedAt = DateTime.Now,
+                        RemoteIp = client.Client.RemoteEndPoint is IPEndPoint ep ? ep.Address.ToString() : "",
+                        RemotePort = client.Client.RemoteEndPoint is IPEndPoint ep2 ? ep2.Port : 0,
+                        LocalPort = client.Client.LocalEndPoint is IPEndPoint ep3 ? ep3.Port : 0
+                    };
 
                     using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(token);
                     timeoutCts.CancelAfter(3000);
 
-                    byte[] buffer = new byte[4096]; // Increased buffer to capture more headers
+                    byte[] buffer = new byte[4096];
                     int bytesRead = 0;
-                    string rawData = "";
+                    byte[] rawBytes = Array.Empty<byte>();
+                    DateTime? firstByteTime = null;
 
                     try
                     {
                         var stream = client.GetStream();
+
+                        // READ ONLY — never write anything back
                         bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, timeoutCts.Token);
+
                         if (bytesRead > 0)
                         {
-                            rawData = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                            rawBytes = buffer.Take(bytesRead).ToArray();
+                            firstByteTime = DateTime.Now;
                         }
                     }
                     catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested)
                     {
-                        rawData = "[Timeout]";
+                        details.TimedOut = true;
                     }
 
-                    // 1. Sanitize and Extract Request Line (First line)
-                    string[] lines = rawData.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                    string firstLine = lines.Length > 0 ? lines[0] : "[No Data]";
-                    string tool = Regex.Replace(firstLine, @"[^\x20-\x7E]", ".");
-                    if (tool.Length > 100) tool = tool.Substring(0, 100) + "...";
+                    details.RawBytes = rawBytes;
+                    details.BytesRead = bytesRead;
+                    details.DisconnectedAt = DateTime.Now;
 
-                    // 2. Extract specific Headers
-                    string userAgent = "Not Found";
-                    string referer = "Not Found";
-
-                    foreach (string line in lines)
+                    // Detect if client closed connection
+                    try
                     {
-                        if (line.StartsWith("User-Agent:", StringComparison.OrdinalIgnoreCase))
-                            userAgent = line.Substring(11).Trim();
-                        if (line.StartsWith("Referer:", StringComparison.OrdinalIgnoreCase))
-                            referer = line.Substring(8).Trim();
+                        details.ClientClosed =
+                            client.Client.Poll(1, SelectMode.SelectRead) &&
+                            client.Client.Available == 0;
+                    }
+                    catch
+                    {
+                        details.ClientClosed = false;
                     }
 
-                    // 3. Build Log Entry
-                    string logEntry = $"[{DateTime.Now:HH:mm:ss}] Connection from {remoteIp}{Environment.NewLine}";
-                    logEntry += $"   Request: {tool}{Environment.NewLine}";
-                    logEntry += $"   Agent:   {userAgent}{Environment.NewLine}";
-                    if (referer != "Not Found") logEntry += $"   Referer: {referer}{Environment.NewLine}";
-                    string separator = new string('-', 40) + Environment.NewLine;
+                    if (firstByteTime.HasValue)
+                        details.TimeToFirstByte = firstByteTime.Value - details.ConnectedAt;
 
-                    // 4. Update UI (Thread-safe)
-                    Invoke(() =>
-                    {
-                        richTextBox1.AppendText(logEntry + separator);
-                        richTextBox1.ScrollToCaret();
+                    // Process raw bytes into structured fields
+                    ProcessConnectionDetails(details);
 
-                        if (!lstIPs.Items.Contains(remoteIp))
-                        {
-                            lstIPs.Items.Add(remoteIp);
-                        }
-                    });
-
-                    // 5. Write to File
-                    try { await File.AppendAllTextAsync(_currentLogPath, logEntry + separator); }
-                    catch { /* Handle file locks */ }
+                    // Log to UI + file
+                    LogConnection(details);
                 }
             }
-            catch (OperationCanceledException) { /* App stopped */ }
+            catch (OperationCanceledException)
+            {
+                // normal shutdown
+            }
             catch (Exception ex)
             {
                 Invoke(() => lblStatus.Text = $"Error: {ex.Message}");
             }
+        }
+
+        private void ProcessConnectionDetails(ConnectionDetails details)
+        {
+            var raw = details.RawBytes;
+
+            // First bytes (hex + ascii)
+            var firstBytes = raw.Take(32).ToArray();
+            details.FirstBytesHex = BitConverter.ToString(firstBytes);
+            details.FirstBytesAscii = new string(firstBytes.Select(b =>
+                b >= 0x20 && b <= 0x7E ? (char)b : '.').ToArray());
+
+            // Convert to text
+            string text = raw.Length > 0
+                ? Encoding.UTF8.GetString(raw)
+                : "";
+
+            string[] lines = text.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+
+            details.FirstLineRaw = lines.Length > 0 ? lines[0] : "";
+            details.FirstLineSanitized = Regex.Replace(details.FirstLineRaw, @"[^\x20-\x7E]", ".");
+
+            // Header extraction (only lines with colon)
+            details.HeaderLines = new List<string>();
+            for (int i = 1; i < lines.Length; i++)
+            {
+                string line = lines[i];
+
+                if (string.IsNullOrWhiteSpace(line))
+                    break;
+
+                if (line.Contains(':'))
+                    details.HeaderLines.Add(line);
+            }
+
+            // Body extraction (only if headers exist)
+            int blankIndex = Array.FindIndex(lines, l => string.IsNullOrWhiteSpace(l));
+            if (details.HeaderLines.Count > 0 && blankIndex >= 0 && blankIndex < lines.Length - 1)
+                details.Body = string.Join("\n", lines.Skip(blankIndex + 1));
+
+            // Line stats
+            details.LineCount = lines.Length;
+            details.MaxLineLength = lines.Any() ? lines.Max(l => l.Length) : 0;
+
+            // ASCII / printable / entropy
+            if (raw.Length > 0)
+            {
+                int asciiCount = raw.Count(b => b <= 0x7F);
+                int printableCount = raw.Count(b => b >= 0x20 && b <= 0x7E);
+
+                details.AsciiPercentage = asciiCount * 100.0 / raw.Length;
+                details.PrintablePercentage = printableCount * 100.0 / raw.Length;
+
+                var groups = raw.GroupBy(b => b).Select(g => g.Count() / (double)raw.Length);
+                details.Entropy = -groups.Sum(p => p * Math.Log(p, 2));
+            }
+        }
+
+        private void LogConnection(ConnectionDetails details)
+        {
+            string logEntry =
+                $"[{DateTime.Now:HH:mm:ss}] Connection from {details.RemoteIp}:{details.RemotePort} → {details.LocalPort}\n" +
+                $"   Connected:     {details.ConnectedAt:HH:mm:ss.fff}\n" +
+                $"   Disconnected:  {details.DisconnectedAt:HH:mm:ss.fff}\n" +
+                $"   Duration:      {(details.Duration).TotalMilliseconds:F0} ms\n" +
+                $"   Timed Out:     {(details.TimedOut ? "Yes" : "No")}\n" +
+                $"   Client Closed: {(details.ClientClosed ? "Yes" : "No")}\n\n" +
+                $"   Bytes Read:    {details.BytesRead}\n" +
+                //$"   First Bytes:   {details.FirstBytesHex}\n" +
+                $"   ASCII:         {details.AsciiPercentage:F1}%   Printable: {details.PrintablePercentage:F1}%\n" +
+                $"   Entropy:       {details.Entropy:F2}\n\n";
+
+            // Always show first line if printable
+            if (!string.IsNullOrWhiteSpace(details.FirstLineSanitized))
+                logEntry += $"   First Line:    {details.FirstLineSanitized}\n";
+
+            // Binary payload suppression
+            if (details.PrintablePercentage < 80.0)
+            {
+                logEntry += "   Payload:       [Binary data suppressed]\n";
+                logEntry += new string('-', 40) + "\n";
+            }
+            else
+            {
+                logEntry +=
+                    $"   Lines:         {details.LineCount}\n" +
+                    $"   Max Line Len:  {details.MaxLineLength}\n\n";
+
+                if (details.HeaderLines.Count > 0)
+                {
+                    logEntry += "   Headers:\n";
+                    foreach (var h in details.HeaderLines)
+                        logEntry += $"      {h}\n";
+                    logEntry += "\n";
+                }
+
+                if (!string.IsNullOrWhiteSpace(details.Body))
+                {
+                    logEntry += "   Body:\n";
+                    logEntry += details.Body + "\n\n";
+                }
+                logEntry += new string('-', 40) + "\n";
+            }
+
+            // UI update
+            Invoke(() =>
+            {
+                richTextBox1.AppendText(logEntry);
+                richTextBox1.ScrollToCaret();
+
+                if (!lstIPs.Items.Contains(details.RemoteIp))
+                    lstIPs.Items.Add(details.RemoteIp);
+            });
+
+            // File logging
+            try { File.AppendAllText(_currentLogPath, logEntry); }
+            catch { }
         }
 
         private void StopMonitoring()
