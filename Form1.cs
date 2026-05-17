@@ -61,7 +61,7 @@ namespace PortMonitor
                 _currentLogPath = Path.Combine(logDir, fileName);
 
                 // 3. Overwrite/Create the file immediately
-                string logEntry = $"--- Monitor Started on Port {txtPort.Text} at {DateTime.Now} ---{Environment.NewLine}";
+                string logEntry = $"--- Monitoring started on port {txtPort.Text} at {DateTime.Now} ---{Environment.NewLine}";
                 richTextBox1.AppendText(logEntry);
                 File.AppendAllText(_currentLogPath, logEntry);
 
@@ -297,7 +297,7 @@ namespace PortMonitor
             lblStatus.Text = "Idle";
             if (!string.IsNullOrEmpty(_currentLogPath))
             {
-                string logEntry = $"--- Monitor Stopped at {DateTime.Now} ---{Environment.NewLine}";
+                string logEntry = $"--- Monitoring stopped at {DateTime.Now} ---{Environment.NewLine}";
                 richTextBox1.AppendText(logEntry);
                 File.AppendAllText(_currentLogPath, logEntry);
             }
