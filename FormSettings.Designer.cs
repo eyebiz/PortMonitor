@@ -29,68 +29,54 @@
         private void InitializeComponent()
         {
             chkCloseToTray = new CheckBox();
+            chkMinimizeToTray = new CheckBox();
             chkOpenMinimized = new CheckBox();
             btnSaveSettings = new Button();
-            chkMinimizeToTray = new CheckBox();
+            groupBoxGeneral = new GroupBox();
             SuspendLayout();
-            // 
+
+            // groupBoxGeneral
+            groupBoxGeneral.Text = "General";
+            groupBoxGeneral.Location = new Point(12, 12);
+            groupBoxGeneral.Size = new Size(260, 120);
+
             // chkCloseToTray
-            // 
             chkCloseToTray.AutoSize = true;
-            chkCloseToTray.Location = new Point(12, 22);
-            chkCloseToTray.Name = "chkCloseToTray";
-            chkCloseToTray.Size = new Size(93, 19);
-            chkCloseToTray.TabIndex = 0;
+            chkCloseToTray.Location = new Point(15, 25);
             chkCloseToTray.Text = "Close to Tray";
-            chkCloseToTray.UseVisualStyleBackColor = true;
-            // 
-            // chkOpenMinimized
-            // 
-            chkOpenMinimized.AutoSize = true;
-            chkOpenMinimized.Location = new Point(12, 70);
-            chkOpenMinimized.Name = "chkOpenMinimized";
-            chkOpenMinimized.Size = new Size(114, 19);
-            chkOpenMinimized.TabIndex = 1;
-            chkOpenMinimized.Text = "Open Minimized";
-            chkOpenMinimized.UseVisualStyleBackColor = true;
-            // 
-            // btnSaveSettings
-            // 
-            btnSaveSettings.Location = new Point(219, 45);
-            btnSaveSettings.Name = "btnSaveSettings";
-            btnSaveSettings.Size = new Size(75, 23);
-            btnSaveSettings.TabIndex = 2;
-            btnSaveSettings.Text = "Save";
-            btnSaveSettings.UseVisualStyleBackColor = true;
-            btnSaveSettings.Click += btnSaveSettings_Click;
-            // 
+
             // chkMinimizeToTray
-            // 
             chkMinimizeToTray.AutoSize = true;
-            chkMinimizeToTray.Location = new Point(12, 45);
-            chkMinimizeToTray.Name = "chkMinimizeToTray";
-            chkMinimizeToTray.Size = new Size(113, 19);
-            chkMinimizeToTray.TabIndex = 3;
+            chkMinimizeToTray.Location = new Point(15, 50);
             chkMinimizeToTray.Text = "Minimize to Tray";
-            chkMinimizeToTray.UseVisualStyleBackColor = true;
-            // 
-            // SettingsForm
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(306, 107);
-            Controls.Add(chkMinimizeToTray);
+
+            // chkOpenMinimized
+            chkOpenMinimized.AutoSize = true;
+            chkOpenMinimized.Location = new Point(15, 75);
+            chkOpenMinimized.Text = "Open Minimized";
+
+            // btnSaveSettings
+            btnSaveSettings.Location = new Point(197, 140);
+            btnSaveSettings.Size = new Size(75, 23);
+            btnSaveSettings.Text = "Save";
+            btnSaveSettings.Click += btnSaveSettings_Click;
+
+            // Add controls
+            groupBoxGeneral.Controls.Add(chkCloseToTray);
+            groupBoxGeneral.Controls.Add(chkMinimizeToTray);
+            groupBoxGeneral.Controls.Add(chkOpenMinimized);
+
+            Controls.Add(groupBoxGeneral);
             Controls.Add(btnSaveSettings);
-            Controls.Add(chkOpenMinimized);
-            Controls.Add(chkCloseToTray);
+
+            // Form
+            ClientSize = new Size(284, 180);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "SettingsForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Settings";
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -99,5 +85,6 @@
         private CheckBox chkOpenMinimized;
         private Button btnSaveSettings;
         private CheckBox chkMinimizeToTray;
+        private GroupBox groupBoxGeneral;
     }
 }
