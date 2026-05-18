@@ -1,6 +1,6 @@
 ﻿namespace PortMonitor
 {
-    partial class SettingsForm
+    partial class FormSettings
     {
         /// <summary>
         /// Required designer variable.
@@ -88,7 +88,7 @@
             MinimizeBox = false;
             Name = "SettingsForm";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Config";
+            Text = "Settings";
             ResumeLayout(false);
             PerformLayout();
         }

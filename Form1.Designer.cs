@@ -32,7 +32,7 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             panel1 = new Panel();
             btnExit = new Button();
-            btnConfig = new Button();
+            btnSettings = new Button();
             btnStart = new Button();
             txtPort = new TextBox();
             lblPort = new Label();
@@ -41,7 +41,7 @@
             btnCopyIPs = new Button();
             tabControl1 = new TabControl();
             tabLog = new TabPage();
-            richTextBox1 = new RichTextBox();
+            richTextLog = new RichTextBox();
             tabMap = new TabPage();
             lstGeoData = new ListBox();
             pboxMap = new PictureBox();
@@ -53,7 +53,7 @@
             lblStatus = new ToolStripStatusLabel();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
-            configToolStripMenuItem = new ToolStripMenuItem();
+            settingsToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem1 = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
@@ -92,7 +92,7 @@
             // panel1
             // 
             panel1.Controls.Add(btnExit);
-            panel1.Controls.Add(btnConfig);
+            panel1.Controls.Add(btnSettings);
             panel1.Controls.Add(btnStart);
             panel1.Controls.Add(txtPort);
             panel1.Controls.Add(lblPort);
@@ -111,15 +111,15 @@
             btnExit.UseVisualStyleBackColor = true;
             btnExit.Click += btnExit_Click;
             // 
-            // btnConfig
+            // btnSettings
             // 
-            btnConfig.Location = new Point(375, 5);
-            btnConfig.Name = "btnConfig";
-            btnConfig.Size = new Size(75, 23);
-            btnConfig.TabIndex = 3;
-            btnConfig.Text = "Config";
-            btnConfig.UseVisualStyleBackColor = true;
-            btnConfig.Click += btnConfig_Click;
+            btnSettings.Location = new Point(375, 5);
+            btnSettings.Name = "btnSettings";
+            btnSettings.Size = new Size(75, 23);
+            btnSettings.TabIndex = 3;
+            btnSettings.Text = "Settings";
+            btnSettings.UseVisualStyleBackColor = true;
+            btnSettings.Click += btnSettings_Click;
             // 
             // btnStart
             // 
@@ -190,7 +190,7 @@
             // 
             // tabLog
             // 
-            tabLog.Controls.Add(richTextBox1);
+            tabLog.Controls.Add(richTextLog);
             tabLog.Location = new Point(4, 24);
             tabLog.Name = "tabLog";
             tabLog.Padding = new Padding(3);
@@ -199,16 +199,16 @@
             tabLog.Text = "Log";
             tabLog.UseVisualStyleBackColor = true;
             // 
-            // richTextBox1
+            // richTextLog
             // 
-            richTextBox1.Dock = DockStyle.Fill;
-            richTextBox1.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            richTextBox1.Location = new Point(3, 3);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.ReadOnly = true;
-            richTextBox1.Size = new Size(809, 460);
-            richTextBox1.TabIndex = 1;
-            richTextBox1.Text = "";
+            richTextLog.Dock = DockStyle.Fill;
+            richTextLog.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            richTextLog.Location = new Point(3, 3);
+            richTextLog.Name = "richTextLog";
+            richTextLog.ReadOnly = true;
+            richTextLog.Size = new Size(809, 460);
+            richTextLog.TabIndex = 1;
+            richTextLog.Text = "";
             // 
             // tabMap
             // 
@@ -295,22 +295,22 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { configToolStripMenuItem, exitToolStripMenuItem1 });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { settingsToolStripMenuItem, exitToolStripMenuItem1 });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
             // 
-            // configToolStripMenuItem
+            // settingsToolStripMenuItem
             // 
-            configToolStripMenuItem.Name = "configToolStripMenuItem";
-            configToolStripMenuItem.Size = new Size(110, 22);
-            configToolStripMenuItem.Text = "Config";
-            configToolStripMenuItem.Click += configToolStripMenuItem_Click;
+            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            settingsToolStripMenuItem.Size = new Size(180, 22);
+            settingsToolStripMenuItem.Text = "Settings";
+            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
             // 
             // exitToolStripMenuItem1
             // 
             exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
-            exitToolStripMenuItem1.Size = new Size(110, 22);
+            exitToolStripMenuItem1.Size = new Size(180, 22);
             exitToolStripMenuItem1.Text = "Exit";
             exitToolStripMenuItem1.Click += exitToolStripMenuItem1_Click;
             // 
@@ -364,7 +364,7 @@
         private Panel panel1;
         private Label lblPort;
         private TextBox txtPort;
-        private Button btnConfig;
+        private Button btnSettings;
         private Button btnStart;
         private NotifyIcon notifyIcon1;
         private ContextMenuStrip contextMenuStrip1;
@@ -379,12 +379,12 @@
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem helpToolStripMenuItem;
         private Button btnExit;
-        private ToolStripMenuItem configToolStripMenuItem;
+        private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem1;
         private ToolStripMenuItem aboutToolStripMenuItem;
         private TabControl tabControl1;
         private TabPage tabLog;
-        private RichTextBox richTextBox1;
+        private RichTextBox richTextLog;
         private TabPage tabMap;
         private PictureBox pboxMap;
         private ListBox lstGeoData;

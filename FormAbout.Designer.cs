@@ -1,6 +1,6 @@
 ﻿namespace PortMonitor
 {
-    partial class AboutForm
+    partial class FormAbout
     {
         /// <summary>
         /// Required designer variable.

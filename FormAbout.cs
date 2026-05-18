@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 
 namespace PortMonitor
 {
-    public partial class AboutForm : Form
+    public partial class FormAbout : Form
     {
-        public AboutForm()
+        public FormAbout()
         {
             InitializeComponent();
             pboxAboutLogo.Image = Properties.Resources.AppIcon.ToBitmap();

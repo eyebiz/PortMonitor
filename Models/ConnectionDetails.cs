@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PortMonitor
+namespace PortMonitor.Models
 {
     public class ConnectionDetails
     {

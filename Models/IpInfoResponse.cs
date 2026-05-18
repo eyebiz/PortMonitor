@@ -1,4 +1,4 @@
-﻿namespace PortMonitor
+﻿namespace PortMonitor.Models
 {
     public class IpInfoResponse
     {

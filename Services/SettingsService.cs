@@ -1,20 +1,13 @@
-﻿using System.Text.Json;
+﻿using PortMonitor.Models;
+using System.Text.Json;
 
-namespace PortMonitor
+namespace PortMonitor.Services
 {
-    public class AppSettings
+    public class SettingsService
     {
-        public bool CloseToTray { get; set; } = false;
-        public bool MinimizeToTray { get; set; } = false;
-        public bool OpenMinimized { get; set; } = false;
-        public string LogFolderPath { get; set; } = "logs";
-    }
+        private readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
 
-    public static class ConfigManager
-    {
-        private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
-
-        public static AppSettings Load()
+        public AppSettings Load()
         {
             if (!File.Exists(ConfigPath))
             {
@@ -40,7 +33,7 @@ namespace PortMonitor
             catch { return new AppSettings(); }
         }
 
-        public static void Save(AppSettings settings)
+        public void Save(AppSettings settings)
         {
             try
             {

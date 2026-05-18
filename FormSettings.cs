@@ -1,16 +1,21 @@
 ﻿
+using PortMonitor.Models;
+using PortMonitor.Services;
+
 namespace PortMonitor
 {
-    public partial class SettingsForm : Form
+    public partial class FormSettings : Form
     {
+        private readonly SettingsService _settingsService;
         private AppSettings _currentSettings;
 
-        public SettingsForm()
+        public FormSettings()
         {
             InitializeComponent();
 
             // Load existing settings and check the boxes
-            _currentSettings = ConfigManager.Load();
+            _settingsService = new SettingsService();
+            _currentSettings = _settingsService.Load();
             chkCloseToTray.Checked = _currentSettings.CloseToTray;
             chkMinimizeToTray.Checked = _currentSettings.MinimizeToTray;
             chkOpenMinimized.Checked = _currentSettings.OpenMinimized;
@@ -24,7 +29,7 @@ namespace PortMonitor
             _currentSettings.OpenMinimized = chkOpenMinimized.Checked;
 
             // Save to file
-            ConfigManager.Save(_currentSettings);
+            _settingsService.Save(_currentSettings);
 
             this.DialogResult = DialogResult.OK; // Signal to Form1 that things changed
             this.Close();
