@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using System.Net.Http;
-
-namespace PortMonitor.Services
+﻿namespace PortMonitor.Services
 {
     public class MapService
     {
