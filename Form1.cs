@@ -10,8 +10,8 @@ namespace PortMonitor
         private AppSettings _settings;
         private readonly PortMonitorService _monitor;
         private readonly LogService _log;
-        private readonly MapService _map = new();
-        private readonly GeoIpService _geo = new();
+        private readonly MapService _map;
+        private readonly GeoIpService _geo;
 
         public Form1()
         {
@@ -24,6 +24,8 @@ namespace PortMonitor
             _settings = _settingsService.Load();
             _monitor = new PortMonitorService();
             _log = new LogService();
+            _map = new MapService();
+            _geo = new GeoIpService();
 
             // Subscribe to service events
             _monitor.ConnectionReceived += OnConnectionReceived;
