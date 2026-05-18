@@ -32,7 +32,7 @@ namespace PortMonitor
 
             lstIPs.SelectedIndexChanged += lstIPs_SelectedIndexChanged;
             // Uncomment this for testing 
-            lstIPs.Items.AddRange(["45.198.224.9", "147.185.132.49", "8.216.5.202", "138.68.152.66", "79.124.40.174", "64.227.150.86"]);
+            //lstIPs.Items.AddRange(["45.198.224.9", "147.185.132.49", "8.216.5.202", "138.68.152.66", "79.124.40.174", "64.227.150.86"]);
         }
 
         protected override void OnLoad(EventArgs e)

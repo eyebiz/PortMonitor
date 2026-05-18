@@ -21,16 +21,16 @@
 
 	<PropertyGroup>
 		<!-- Your human-readable version -->
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 
 		<!-- Windows Explorer "File version" -->
-		<FileVersion>1.0.1.0</FileVersion>
+		<FileVersion>1.0.2.0</FileVersion>
 
 		<!-- .NET assembly version (only change on breaking changes) -->
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 
 		<!-- What dotnet publish embeds -->
-		<InformationalVersion>1.0.1</InformationalVersion>
+		<InformationalVersion>1.0.2</InformationalVersion>
 
 		<!-- Prevent Git hash suffix -->
 		<PublishRepositoryUrl>false</PublishRepositoryUrl>
