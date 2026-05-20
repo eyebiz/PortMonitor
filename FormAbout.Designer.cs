@@ -30,71 +30,143 @@
         {
             pboxAboutLogo = new PictureBox();
             lblAboutTitle = new Label();
-            lstAboutInfo = new ListBox();
+            lblAboutSubtitle = new Label();
+            rtbAboutInfo = new RichTextBox();
+            pnlHeader = new Panel();
+            pnlFooter = new Panel();
+            lblGithub = new LinkLabel();
             lblAboutCopyright = new Label();
+            btnClose = new Button();
             ((System.ComponentModel.ISupportInitialize)pboxAboutLogo).BeginInit();
+            pnlHeader.SuspendLayout();
+            pnlFooter.SuspendLayout();
             SuspendLayout();
             // 
             // pboxAboutLogo
             // 
             pboxAboutLogo.Location = new Point(12, 12);
             pboxAboutLogo.Name = "pboxAboutLogo";
-            pboxAboutLogo.Size = new Size(66, 66);
+            pboxAboutLogo.Size = new Size(64, 64);
+            pboxAboutLogo.SizeMode = PictureBoxSizeMode.Zoom;
             pboxAboutLogo.TabIndex = 0;
             pboxAboutLogo.TabStop = false;
             // 
             // lblAboutTitle
             // 
             lblAboutTitle.AutoSize = true;
-            lblAboutTitle.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblAboutTitle.Location = new Point(101, 12);
+            lblAboutTitle.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
+            lblAboutTitle.Location = new Point(90, 12);
             lblAboutTitle.Name = "lblAboutTitle";
-            lblAboutTitle.Size = new Size(142, 30);
+            lblAboutTitle.Size = new Size(164, 32);
             lblAboutTitle.TabIndex = 1;
             lblAboutTitle.Text = "Port Monitor";
             // 
-            // lstAboutInfo
+            // lblAboutSubtitle
             // 
-            lstAboutInfo.FormattingEnabled = true;
-            lstAboutInfo.Location = new Point(101, 55);
-            lstAboutInfo.Name = "lstAboutInfo";
-            lstAboutInfo.Size = new Size(417, 214);
-            lstAboutInfo.TabIndex = 2;
+            lblAboutSubtitle.AutoSize = true;
+            lblAboutSubtitle.Font = new Font("Segoe UI", 10F);
+            lblAboutSubtitle.Location = new Point(92, 50);
+            lblAboutSubtitle.Name = "lblAboutSubtitle";
+            lblAboutSubtitle.Size = new Size(221, 19);
+            lblAboutSubtitle.TabIndex = 2;
+            lblAboutSubtitle.Text = "Lightweight port monitoring utility";
+            // 
+            // rtbAboutInfo
+            // 
+            rtbAboutInfo.BorderStyle = BorderStyle.FixedSingle;
+            rtbAboutInfo.Font = new Font("Segoe UI", 10F);
+            rtbAboutInfo.Location = new Point(12, 100);
+            rtbAboutInfo.Name = "rtbAboutInfo";
+            rtbAboutInfo.ReadOnly = true;
+            rtbAboutInfo.Size = new Size(515, 150);
+            rtbAboutInfo.TabIndex = 0;
+            rtbAboutInfo.Text = "";
+            // 
+            // pnlHeader
+            // 
+            pnlHeader.BackColor = Color.FromArgb(245, 245, 245);
+            pnlHeader.Controls.Add(pboxAboutLogo);
+            pnlHeader.Controls.Add(lblAboutTitle);
+            pnlHeader.Controls.Add(lblAboutSubtitle);
+            pnlHeader.Dock = DockStyle.Top;
+            pnlHeader.Location = new Point(0, 0);
+            pnlHeader.Name = "pnlHeader";
+            pnlHeader.Padding = new Padding(12);
+            pnlHeader.Size = new Size(539, 90);
+            pnlHeader.TabIndex = 1;
+            // 
+            // pnlFooter
+            // 
+            pnlFooter.BackColor = Color.FromArgb(245, 245, 245);
+            pnlFooter.Controls.Add(lblGithub);
+            pnlFooter.Controls.Add(lblAboutCopyright);
+            pnlFooter.Controls.Add(btnClose);
+            pnlFooter.Dock = DockStyle.Bottom;
+            pnlFooter.Location = new Point(0, 260);
+            pnlFooter.Name = "pnlFooter";
+            pnlFooter.Padding = new Padding(12);
+            pnlFooter.Size = new Size(539, 40);
+            pnlFooter.TabIndex = 2;
+            // 
+            // lblGithub
+            // 
+            lblGithub.AutoSize = true;
+            lblGithub.Location = new Point(120, 12);
+            lblGithub.Name = "lblGithub";
+            lblGithub.Size = new Size(104, 15);
+            lblGithub.TabIndex = 2;
+            lblGithub.TabStop = true;
+            lblGithub.Text = "GitHub Repository";
+            lblGithub.LinkClicked += lblGithub_LinkClicked;
             // 
             // lblAboutCopyright
             // 
             lblAboutCopyright.AutoSize = true;
-            lblAboutCopyright.Location = new Point(22, 81);
+            lblAboutCopyright.Location = new Point(12, 12);
             lblAboutCopyright.Name = "lblAboutCopyright";
-            lblAboutCopyright.Size = new Size(45, 15);
-            lblAboutCopyright.TabIndex = 3;
-            lblAboutCopyright.Text = "© 2026";
+            lblAboutCopyright.Size = new Size(81, 15);
+            lblAboutCopyright.TabIndex = 0;
+            lblAboutCopyright.Text = "© 2026 eyebiz";
             // 
-            // AboutForm
+            // btnClose
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(539, 290);
-            Controls.Add(lblAboutCopyright);
-            Controls.Add(lstAboutInfo);
-            Controls.Add(lblAboutTitle);
-            Controls.Add(pboxAboutLogo);
+            btnClose.Location = new Point(440, 8);
+            btnClose.Name = "btnClose";
+            btnClose.Size = new Size(75, 23);
+            btnClose.TabIndex = 1;
+            btnClose.Text = "Close";
+            btnClose.Click += btnClose_Click;
+            // 
+            // FormAbout
+            // 
+            ClientSize = new Size(539, 300);
+            Controls.Add(rtbAboutInfo);
+            Controls.Add(pnlHeader);
+            Controls.Add(pnlFooter);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "AboutForm";
+            Name = "FormAbout";
             StartPosition = FormStartPosition.CenterParent;
             Text = "About";
             ((System.ComponentModel.ISupportInitialize)pboxAboutLogo).EndInit();
+            pnlHeader.ResumeLayout(false);
+            pnlHeader.PerformLayout();
+            pnlFooter.ResumeLayout(false);
+            pnlFooter.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
         private PictureBox pboxAboutLogo;
         private Label lblAboutTitle;
-        private ListBox lstAboutInfo;
         private Label lblAboutCopyright;
+        private Label lblAboutSubtitle;
+        private RichTextBox rtbAboutInfo;
+        private Panel pnlHeader;
+        private Panel pnlFooter;
+        private Button btnClose;
+        private LinkLabel lblGithub;
     }
 }
