@@ -30,13 +30,13 @@ namespace PortMonitor.Services
                 _listener.Start();
 
                 _isRunning = true;
-                StatusChanged?.Invoke($"Listening on port {port}");
+                StatusChanged?.Invoke(string.Format(Strings.StatusListening, port));
 
                 _ = Task.Run(() => ListenLoop(_cts.Token));
             }
             catch (Exception ex)
             {
-                StatusChanged?.Invoke($"Error: {ex.Message}");
+                StatusChanged?.Invoke($"{Strings.StatusError} {ex.Message}");
                 await StopAsync();
             }
         }
@@ -81,7 +81,7 @@ namespace PortMonitor.Services
             }
             catch (Exception ex)
             {
-                StatusChanged?.Invoke($"Error: {ex.Message}");
+                StatusChanged?.Invoke($"{Strings.StatusError} {ex.Message}");
             }
             finally
             {

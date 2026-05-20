@@ -19,6 +19,7 @@ namespace PortMonitor
 
             this.Icon = Properties.Resources.AppIcon;
             notifyIcon1.Icon = Properties.Resources.AppIcon;
+            lblStatus.Text = Strings.StatusIdle;
 
             _settingsService = new SettingsService();
             _settings = _settingsService.Load();
@@ -96,7 +97,7 @@ namespace PortMonitor
                 Invoke(OnMonitoringStopped);
                 return;
             }
-            lblStatus.Text = "Idle";
+            lblStatus.Text = Strings.StatusIdle;
         }
 
         private void OnConnectionReceived(ConnectionDetails d)
@@ -128,7 +129,7 @@ namespace PortMonitor
 
             if (_monitor.IsRunning && lblStatus.Text == snapshot)
             {
-                lblStatus.Text = $"Listening on port {txtPort.Text}...";
+                lblStatus.Text = string.Format(Strings.StatusListening, txtPort.Text);
             }
         }
 
@@ -188,7 +189,7 @@ namespace PortMonitor
                 if (settingsWindow.ShowDialog() == DialogResult.OK)
                 {
                     _settings = _settingsService.Load();
-                    await ShowTemporaryStatus("Settings updated.");
+                    await ShowTemporaryStatus("Settings saved.");
                 }
             }
         }
